@@ -13,4 +13,6 @@ public interface AuthService {
     String register(SignUpDto signUpDto);
 
     List<User> getAllUsers();
+
+    String activateAccount(User user);
 }

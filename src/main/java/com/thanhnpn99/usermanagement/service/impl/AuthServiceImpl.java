@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -44,14 +45,25 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public String login(LoginDto loginDto) {
+        Optional<User> isUserExit = userRepository.findByUsernameOrEmail(loginDto.getUsernameOrEmail(),loginDto.getUsernameOrEmail());
 
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                loginDto.getUsernameOrEmail(), loginDto.getPassword()));
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        if (!isUserExit.isEmpty()){
+            if (isUserExit.get().isActive()==true){
+                Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                        loginDto.getUsernameOrEmail(), loginDto.getPassword()));
 
-        String token = jwtTokenProvider.generateToken(authentication);
-        return token;
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+
+                String token = jwtTokenProvider.generateToken(authentication);
+
+                return token;
+            }else{
+                return "Your account has not been activated yet.Please contact your admin";
+            }
+        }else{
+            return "Sorry! Your account is not found.";
+        }
     }
 
     @Override
@@ -88,5 +100,12 @@ public class AuthServiceImpl implements AuthService {
         return userRepository.findAll();
     }
 
+    @Override
+    public String activateAccount(User users){
+        Optional<User> user= userRepository.findById(users.getId());
+            user.get().setActive(true);
+            userRepository.save(user.get());
+            return "Successfully account activated";
+    }
 
 }

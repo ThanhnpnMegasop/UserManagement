@@ -7,6 +7,7 @@ import com.thanhnpn99.usermanagement.entity.User;
 import com.thanhnpn99.usermanagement.service.AuthService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,12 +21,6 @@ public class AuthController {
     public AuthController(AuthService authService) {
         this.authService = authService;
     }
-
-    // handler method to handle home page request
-//    @GetMapping("/index")
-//    public String home(){
-//        return "index";
-//    }
 
     // Build Login REST API
     @PostMapping(value = {"/login", "/signin"})
@@ -46,9 +41,17 @@ public class AuthController {
     }
 
     // Build Get All Users REST API
+    @PreAuthorize("isAuthenticated() and hasRole('ADMIN')")
     @GetMapping(value = {"/users"})
     public ResponseEntity<List<User>> getAllUsers(){
         List<User> users = authService.getAllUsers();
         return new ResponseEntity<>(users, HttpStatus.OK);
+    }
+
+    @PreAuthorize("isAuthenticated() and hasRole('ADMIN')")
+    @PutMapping(value = {"/activate_account"})
+    public ResponseEntity<String> activateAccount(@RequestBody User users) {
+        String response = authService.activateAccount(users);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
