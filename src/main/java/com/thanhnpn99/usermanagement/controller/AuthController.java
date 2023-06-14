@@ -41,14 +41,14 @@ public class AuthController {
     }
 
     // Build Get All Users REST API
-    @PreAuthorize("isAuthenticated() and hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping(value = {"/users"})
     public ResponseEntity<List<User>> getAllUsers(){
         List<User> users = authService.getAllUsers();
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
-    @PreAuthorize("isAuthenticated() and hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping(value = {"/activate_account"})
     public ResponseEntity<String> activateAccount(@RequestBody User users) {
         String response = authService.activateAccount(users);
