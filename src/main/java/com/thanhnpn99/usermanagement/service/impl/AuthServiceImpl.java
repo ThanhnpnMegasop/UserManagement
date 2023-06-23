@@ -86,10 +86,15 @@ public class AuthServiceImpl implements AuthService {
         user.setPassword(passwordEncoder.encode(registerDto.getPassword()));
 
         Set<Role> roles = new HashSet<>();
-        Role userRole = roleRepository.findByName("ROLE_USER").get();
-        roles.add(userRole);
+        Optional<Role> optionalRole = roleRepository.findByName("ROLE_USER");
+        if (optionalRole.isPresent()){
+            Role userRole = optionalRole.get();
+            roles.add(userRole);
+        }else{
+            // handle the case where the value is not present
+            System.out.println("No value present");
+        }
         user.setRoles(roles);
-
         userRepository.save(user);
 
         return "User registered successfully!.";
